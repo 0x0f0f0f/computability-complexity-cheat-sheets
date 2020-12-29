@@ -1,0 +1,543 @@
+\documentclass[10pt,landscape]{article}
+\usepackage{multicol}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[a3paper,landscape]{geometry}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+% COMANDI UTILI
+
+\newcommand{\bumper}{\triangleright}
+\newcommand{\impl}{\Rightarrow}
+\newcommand{\conv}{\downarrow}
+\newcommand{\dive}{\uparrow}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\renewcommand{\O}{\mathcal{O}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\E}{\mathcal{E}}
+\renewcommand{\P}{\mathcal{P}}
+\newcommand{\NP}{\mathcal{NP}}
+\newcommand{\LOGSPACE}{\mathrm{LOGSPACE}}
+\newcommand{\SPACE}{\mathrm{SPACE}}
+\newcommand{\PSPACE}{\mathrm{PSPACE}}
+\newcommand{\NSPACE}{\mathrm{NSPACE}}
+\newcommand{\NPSPACE}{\mathrm{NPSPACE}}
+\newcommand{\EXP}{\mathrm{EXP}}
+\newcommand{\YES}{\mathrm{YES}}
+\newcommand{\NO}{\mathrm{NO}}
+\newcommand{\TIME}{\mathrm{TIME}}
+\newcommand{\PTIME}{\mathrm{PTIME}}
+\newcommand{\NTIME}{\mathrm{NTIME}}
+
+\newcommand{\EXPTIME}{\mathrm{EXPTIME}}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+
+\renewcommand{\H}{\mathcal{H}}
+
+\newcommand{\undef}{\text{undefined}}
+\newcommand{\red}[1]{\leqslant_{#1}}
+%\newcommand{\C}{\mathbb{C}}
+\renewcommand{\iff}{\Leftrightarrow}
+
+
+\theoremstyle{plain}% default
+\newtheorem*{thm}{Theorem}
+\newtheorem*{lem}{Lemma}
+\newtheorem*{prop}{Prop}
+\newtheorem*{cor}{Corollary}
+\theoremstyle{definition}
+\newtheorem{defn}{Definizione}[section]
+\newtheorem{conj}{Congettura}[section]
+\newtheorem{exmp}{Esempio}[section]
+\newtheorem{exrc}[exmp]{Esercizio}
+\theoremstyle{remark}
+\newtheorem*{comm}{Commento}
+\newtheorem*{note}{Note}
+\newtheorem{caso}{Caso}
+
+
+
+% This sets page margins to .5 inch if using letter paper, and to 1cm
+% if using A4 paper. (This probably isn't strictly necessary.)
+% If using another size paper, use default 1cm margins.
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+	{ \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+
+% Turn off header and footer
+\pagestyle{empty}
+ 
+
+% Redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+
+% -----------------------------------------------------------------------
+
+\begin{document}
+
+\raggedright
+\footnotesize
+\begin{multicols}{4}
+
+
+% multicol parameters
+% These lengths are set only within the two main columns
+%\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+     \Large{\textbf{Complexity Cheat Sheet}} \\
+     \small{Alessandro Cheli - 2020 - University of Pisa}
+\end{center}
+
+
+\section{Turing Machines}
+\textbf{Deterministic} TMs are seen in the \textit{Computability Theory Cheat Sheet}.
+
+\subsection{K-tapes Turing Machines}
+Let $k \geq 1$ be the number of tapes. A k-tape TM is a quadruple $(Q, \Sigma, \delta, q_0)$.
+Special symbols $\#, \bumper, \in \Sigma$, while $L,R,- \notin \Sigma$. Since we are
+only considering decision problems, $\YES,\NO \notin Q$ are the halting states.
+The transition function differs but is subject to the same restrictions as a classical TM.
+\[\delta : Q \times \Sigma^k \to Q \cup \{\YES, \NO\} \times (\Sigma \times \{L, R, -\})^k \]
+
+\subsection{IO Turing Machines}
+Are useful to study space complexity.
+Any k-tape TM $M = (Q, \Sigma, \delta, q_0)$ is of IO type $\iff \delta$ is subject
+to the following constraints. Consider $\delta(q_1, \sigma_1, \hdots, \sigma_k) = (q', (\sigma_1', D_1), \hdots, (\sigma_k', D_k))$
+
+\begin{tabular}{@{}ll@{}}
+    $\sigma_1' = \sigma_1$ & First tape is read-only \\
+    $D_k = R$ or $(D_k = -) \impl \sigma'_k = \sigma_k$ & Last tape is write-only \\ 
+    $\sigma_1 = \# \impl D_1 \in \{L, -\}$ & Input tape is right-bounded 
+\end{tabular}
+
+\subsection{Nondeterministic Turing Machines}
+A \textbf{nondeterministic} TM is a quadruple $N = (Q, \Sigma, \Delta, q_0)$ where
+$Q, \Sigma, q_0$ are the same as in other turing machines. They can be of IO and k-tape type.
+The difference rilies in the fact that 
+
+\[ \Delta \subseteq (Q \times \Sigma) \times ((Q \cup \{\YES, \NO\}) \times \Sigma \times \{L,R, -\}) \]
+
+Is not a transition function but a \textbf{transition relation}.
+The same syntax as for other TMs is used for nondet. TMs configurations and computations.
+A nondeterministic TM $N$ decides $I$ if and only if $x \in I \iff $ there exists \textbf{at least} a computation 
+such that $(q_0, \underline{\bumper}, x, \bumper, \hdots, \bumper) \to^*_N (\YES, w_1, \hdots, w_k)$
+
+\begin{note}
+    A single computation on a nondeterministic TMs is not a tree.
+    Many computations together, can be arranged in a tree.
+\end{note}
+
+The \textbf{degree} $d$ of nondeterminism of a NDTM $N = (Q, \Sigma, \Delta, q_0)$ can now be defined as
+$d = \max\{ \deg{(q,\sigma)} \mid q \in Q, \sigma \in \Sigma\}$, where 
+$\text{deg}(q, \sigma) = \#\{(q', \sigma', D) \mid ((q, \sigma), (q', \sigma', D)) \in \Delta\}$
+
+\subsection{Computation Table}
+A computation table $T_M$ is a square matrix where rows represent the configuration  
+at current computation step number (index $i$) of a polynomial time deterministic, 1-tape TM $M$ on an input $x$.
+The column (index $j$) represent the $j$-th slot on tape.
+Since $M$ decides $I$ in time $\O(\abs{x}^k)$, and space is limited by time, the matrix is
+of size $\abs{x}^k$. To define it, the definition of the deterministic TM has to be slightly changed.
+First we use $\Sigma' = \Sigma \cup \{\sigma_q \mid \sigma_q \in \Sigma \times (Q \cup \{\epsilon\})\}$ as the 
+alphabet, enriching symbols with a subscript containing the current state. These \textit{subscript} symbols
+keep track of the head position and current state at time $i$.
+A new machine $M'$ can be built from $M$, and this new construction does not take $M'$ out of $\P$.
+Computation tables follow these rules: 
+\begin{tabular}{@{}ll@{}}
+    $\abs{x} \geq 2$ & $\forall i . T(i,1) = \bumper $  \\
+    $\forall j.\ 2 \leq j \leq \abs{x} + 1$ & $T(1,j)$ contains the $j-1$-th symbol of $x$ \\
+    $\forall j.\ \abs{x} + 2 \leq j \leq \abs{x}^k$ & $T(1,j)$ contains $\#$ \\
+    $\forall i . T(i,\abs{x}^k) = \# $ & Always use less space than time \\
+    $\forall i \geq 2, j \geq 2.\ T(i,j)$ & depends only on $T(i-1,j-1),T(i-1,j)$\\
+    & and $T(i-1,j+1)$.
+\end{tabular} \\
+Initial configuration starts from $\bumper \underline{\sigma_{q_0}}$ and not from $\underline{\bumper} \sigma_{q_0}$ \\
+The head never positions on column 1 (on $\bumper$).\\
+If $T(i,j) \in \{\sigma_{\YES},\sigma_{\NO}\}$, add an auxiliary state that moves 
+the tape head to $T(i, 2)$.
+$M$ accepts $x \iff \exists i .\ T(i,2) = \sigma_{\YES} = T(\abs{x}^k, 2)$, therefore
+all lines between that index $i$ and $\abs{x}^k$ are equal to line $i$.
+
+%==================== TIME AND SPACE MEASURES =======================
+
+\section{Time and Space Measures}
+
+The size of a datum $x$, is a total (easily) computable function $\abs{x}$, which returns $n \in \N$, computed
+from memory usage, number of components of the datum, or other criteria.
+Given a TM $M$ (the same applies for IO and k-tape machines), $t$ is the time needed by a  to decide $x \in I$, given by
+
+\[(q_0, \underline{\bumper} x) \to^t (H, w) \text{ with } H \in \{\YES, \NO\}\]
+
+
+\subsection{Deterministic Time Measures}
+
+A measuring function $f : \N \to \N$ is said to be \textbf{appropriate} $\iff$
+it is strictly increasing and $\exists$ a TM $M$ that $\forall x . \ M(x) = \diamond^{f(\abs{x})}$,
+in time $\O(f(\abs{x}) + \abs{x})$ and space $\O(f(\abs{x}))$.
+
+$M$ decides $I$ in \textit{deterministic time} $f$ if $\forall x$,
+the time $t$ required to compute $M(x)$ is $\leq f(\abs{x})$.
+A \textbf{Complexity Class} can now be defined:
+
+\[\TIME(f) = \{I \mid \exists M \text{ deciding } I \text{ in deterministic time } f\}\]
+
+Asymptotic notation is commonly used to denote time complexity and to simplify.
+Constants are commonly ignored (treated as $r$)
+
+\[\O(f) = \{g \mid \exists r \in \R^+ . \ g(n) < rf(n) \text{ almost everywhere}\}\]
+
+\subsection{Nondeterministic Time Measures}
+
+A nondet. TM $N$ decides $I$ in \textbf{nondeterministic time} $f(n) \iff N$ decides $I$ and
+$\forall x \in I . \ \exists t $ such that $N$ \textit{halts and accepts} $x$ in $t$ steps,
+with $t \leq f(\abs{x})$. Because of nondeterminism, there can be many computations that
+satisfy (or don't) those requirements. We consider only the shortest accepting computation.
+
+\[\NTIME(f) = \{I \mid \exists N \text{ deciding } I \text{ in non deterministic time } f\}\]
+
+\subsection{Deterministic and Nondeterministic Space Measures}
+
+To measure space, we would have to edit the definition of TMs,
+by adding an additional \textit{right bumper} $\triangleleft$ that 
+denotes the end of the tape. This way ($k$-tape and IO) TMs 
+will remember \textit{how many slots} were visited.
+$\forall$ computation halting in a state $(H, w_1, \hdots, w_n)$ with $H \in \{\YES, \NO\}$, 
+the space required by a $k$-tape IO TM is $\sum_{i=2}^{k-1}\abs{w_i}$.
+$M$ decides $I$ in deterministic space $f(n)$ if $\forall x $ the spaced required 
+to compute $M(x)$ is $\leq f(\abs{x})$, and it follows that $I \in \SPACE(f(n))$.
+The same idea can be applied to nondeterministic machines, considering the additional 
+restraint on accepting, to define $\NSPACE$.
+
+\section{Complexity Classes}
+
+\begin{equation*}
+    \begin{aligned}
+            \begin{matrix}
+            \P = \bigcup_{k\geq1} \TIME(n^k) &\quad& \NP = \bigcup_{k\geq1} \NTIME(n^k) \\
+            &&\\ 
+            \PSPACE = \bigcup_{k\geq1} \SPACE(n^k) &\quad& \NPSPACE = \bigcup_{k\geq1} \NSPACE(n^k)
+            \end{matrix} \\ 
+            \begin{matrix}
+                \EXP = \bigcup_{k\geq1} \TIME(2^{n^k}) &
+                \LOGSPACE = \bigcup_{k\geq1} \SPACE(k \times \log(n))
+            \end{matrix}
+    \end{aligned}
+\end{equation*}
+
+$\P, \PSPACE, \LOGSPACE$ are closed with respect to model transformations and are therefore robust classes of problems.
+$\NP$ can also be defined as the set of problems that allow \textit{verification in polynomial time}
+
+\subsection{Hierarchy}
+
+\[ \LOGSPACE \subseteq \P \subseteq \NP \subseteq \PSPACE = \NPSPACE \subset \EXP \subset R \subset RE \]
+
+Since $\LOGSPACE \subsetneq \PSPACE$, at least one of those inclusions is strict:
+\[ \LOGSPACE \subseteq \P, \P \subseteq \NP, \NP \subseteq \PSPACE \]
+
+It is not yet know which one of those is a strict inclusion. \\[.2cm]
+
+\textbf{Theorem. } $\LOGSPACE \subseteq \P$. \textit{Proof.}
+Let $I \in \LOGSPACE$. There $\exists$ a TM that computes $x \in I$
+in $\O(\log \abs{x})$ space. $M$ can range through $\O(\abs{x} \log\abs{x} \#Q \#\Sigma^{\log\abs{x}})$
+configurations. A halting computation cannot cycle on configurations. So M computes in $\O(\abs{x}^k)$ for some $k$.
+\\[.2cm]
+
+\textbf{Theorem. (Savitch)} $\NPSPACE = \PSPACE$.
+\\[.2cm]
+
+\textbf{Theorem. Hierarchy of time and space}.
+If $f$ is appropriate, then $\TIME(f(n)) \subsetneq \TIME((f(2n+1))^3)$, and 
+$\SPACE(f(n)) \subsetneq \SPACE(f(n) \times \log f(n))$.
+\textbf{Corollary. } $\P \subsetneq \EXP$\\
+\textit{Proof.}
+$\P \subset \EXP$ is obvious because $2^n$ grows faster than any polynomial. It is 
+strict because $\P \subseteq \TIME(2^n) \subsetneq \TIME((2^{(2n+1)})^3) \subseteq \TIME(2^{n^2}) $.
+This corollary, together with the fact that $\NTIME(f(n)) \subseteq \TIME(c^{f(n)})$ lets us
+conclude that $\NP \subseteq \EXP$.
+\\[.2cm]
+
+\textbf{Theorem. Hierarchy 2}. Let $f$ be an appropriate measuring function, and $k$ a constant. Then
+    \begin{tabular}{@{}ll@{}}
+        $\SPACE(f(n)) \subseteq \NSPACE(f(n))$  & $\TIME(f(n)) \subseteq \NTIME(f(n))$ \\ 
+        $\NSPACE(f(n)) \subseteq \TIME(k^{\log n + f(n)})$ & \\ 
+    \end{tabular}
+\\[.2cm]
+
+\textbf{Theorem. Arbitrarily Hard Problems}: $\forall g $ total computable func. 
+    $\exists I \in \TIME(f(n))$
+    and $I \notin \TIME(g(n))$, with $f(n) > g(n)$ almost everywhere. 
+
+Using arbitrary measuring functions entails bizarre consequences:
+\\[.2cm]
+
+\textbf{Theorem. Blum speedup} $\forall h$ total computable func. $\exists$ a problem $I$ 
+such that $\forall M$ algorithm deciding $I$ in time $f$, $\exists M'$ deciding
+$I$ in time $f'$ such that $f(n) > h(f'(n))$ almost everywhere. This theorem guarantees
+that there are problems that have no optimal algorithm. Although 
+given an $h$, the problems built for this theorem are artificial and not useful,
+and we do not know how to construct them. \\[.2cm]
+
+\textbf{Theorem. Borodin's Gap} There exists $f$ total computable such that
+$\TIME(f(n)) = \TIME(2^{f(n)})$ \\[.2cm]
+
+These last two theorems are also valid for \textit{space measures.}
+
+%===================== MACHINES THEOREMS ======================
+
+\section{Theorems on Complexity of Turing Machines}
+
+
+\begin{thm} \textbf{Reduction of tapes}
+    Let $M$ be a $k$-tape TM, deciding $I$ in deterministic time $f$,
+    then $\exists$ a 1 tape TM $M'$ that decides $I$ in time $\O(f^2)$
+
+
+    \begin{proof} (Only a draft):
+        Build a 1 tape TM $M'$ by introducing two symbols $\bumper'$ and
+        $\triangleleft'$ to denote the start and end of the $k$-th tape.
+        Introduce $\#\Sigma$ new symbols $\overline{\sigma_i}$ to remember
+        each tape's head location.
+        To generate the initial configuration $(q, \bumper \bumper' x \triangleleft' (\bumper' \triangleleft' )^k )$,
+        $2k + \#\Sigma$ states and $\O(\abs{k})$ steps are needed.
+        To simulate a move of $M$, $M'$ iterates the input datum from left to right, and back,
+        2 times: find the marked $\overline{\sigma_i}$ symbols, the second time write the new
+        symbols. If a tape has to be extended, the $\triangleleft'$ parens have to be moved 
+        and a cascade happens. This takes $\O(f(\abs{x}))$ time, for each move of $M$. Since
+        $M$ takes $\O(f(\abs{x}))$ time to compute an answer, $M'$ will take $\O(f(\abs{x})^2)$
+    \end{proof}
+\end{thm}
+
+\begin{cor}
+    Parallel machines are polinomially faster than sequential machines.
+\end{cor}
+
+\framebox{
+    \parbox[t][]{5.8cm}{
+    A machine cannot use more space than time
+    }
+} \\[.2cm]
+
+
+\textbf{Theorem. Linear speedup}
+If $I \in \TIME(f)$, then $\forall \epsilon \in \R^+  . \ I \in \TIME(\epsilon \times f(n) + n + 2)$.
+\textit{Proof.}
+        (Draft): Build $M'$ from $M$ solving $I$, compacting $m$ symbols of $M$ into 1 of $M'$, in function of $\epsilon$.
+        The states of $M'$ will be triples $[q,\sigma_{i_1},\hdots,\sigma_{i_m},k]$ meaning the TM is in state $q$
+        and has cursor on $k$-th symbol of $\sigma_{i_1},\hdots,\sigma_{i_m}$. $M'$ then needs 6 steps to simulate
+        $m$ steps of $M$. Therefore, $M'$ will take $\abs{x} + 2 + 6 \times \lceil \frac{f(\abs{x})}{m}\rceil$. 
+        Then $m = \lceil \frac{6}{\epsilon} \rceil$.
+        \qed \\[.2cm]
+
+Same principle can apply to $\SPACE$ with \textbf{linear space compression}.
+If $I \in \SPACE(f(n))$, then $\forall \epsilon \in \R^+  . \ I \in \SPACE(\epsilon \times f(n) + 2)$ 
+
+\begin{thm}
+    For each k-tape TM $M$ that decides I in deterministic time $f$ there exists
+    an IO TM $M'$ with k+2 tapes that computes I in time $c \times f$ for some constant $c$.  
+
+    \begin{proof}
+        $M'$ copies the first $M$ tape to the second tape, in $\abs{x} + 1$ steps.
+        Then, $M'$ operates identically to $M$. If and when $M$ halts,
+        $M'$ copies the result to the tape $k+2$, in at most $f(\abs{x})$ steps.
+        $M'$ computation was $2f(\abs{x}) + \abs{x} + 1$ steps long. 
+    \end{proof}
+\end{thm}
+
+
+\begin{thm} \textbf{Exponential loss in determinization, or bruteforce}
+    If $I \in NTIME(f(n))$ and is computed by $k$-tape $N$, it can also be computed by a deterministic 
+    TM $M$ with $k+1$ tapes in
+    time $\O(c^{f(n)})$ with 
+    an exponential loss of performance. In short, $\NTIME(f(n)) \subseteq \TIME(c^{f(n)})$ 
+
+    \begin{proof}
+        Let $d$ be the degree of nondeterminism of $N$. 
+        $\forall q \in Q, \sigma \in \Sigma$ sort $\Delta(q,\sigma)$ lexicographically.
+        Every computation of length $t$ carried by $N$ is a sequence of choices that can
+        be seen as a sequence of natural numbers $(c_1, \hdots, c_t)$ with $c_i \in [0..d-1]$.
+        The det. TM $M$ considers these successions in an increasing order, visiting
+        the tree of nondeterministic computations, one at a time.
+        Therefore $M(x)\conv \ \iff N(x)\conv$, also, all the possible simulations
+        can be $\O(d^{f(n) + 1})$.
+    \end{proof}
+\end{thm}
+
+\section{Problems in P and NP}
+A problem $I$ \textit{reduces efficiently} to $I'$ ($I \red{\text{logspace}} I'$) if
+$\exists f \in \LOGSPACE$ such that $x \in I \iff f(x) \in I'$.
+Let $\D, \E \in \{\P, \NP, \EXP, \PSPACE, \NPSPACE\}$ and $\D \subseteq \E$, then
+$\red{\text{logspace}}$ classifies $\{\LOGSPACE\}$ and $\E$.
+Also, $\red{\text{logspace}}$ and $\red{\P}$ classify $\D$ and $\E$. (See the 
+\textit{computability theory cheat sheet}).
+
+
+\begin{note}
+    A TM operating in logarithmic space, composed to another $\LOGSPACE$ machine is still in $\LOGSPACE$. 
+\end{note}
+
+\subsection{NP complete problems}
+
+\textbf{Traveling Salesman Problem}
+Let $G$ be a directed weighted graph with $n$ vertices, all connected to each other.
+Let $d(i,j)$ be the cost function for (weight) on edge $(i,j)$. The problem consists in finding 
+the \textit{hamiltonian cycle} (permutation of nodes) with the minimum cost: $\sum_{1 \leq i \leq n-1} d(i,i+1)$.
+To see this as a decision problem we have to check if the total cost of the path is $\leq$ of a treshold $B$.
+A \textit{deterministic} TM that bruteforces the problem first builds \textit{all permutations} of $[1..n]$
+in $\frac{(n-1)!}{2}$ steps, and then searches for the first permutation with cost $\leq B$ 
+with costs $\O(n^3)$. A \textit{nondeterministic} TM solves the problem in $\O(n^3)$
+by first generating all sequences of numbers $[1..n]$ of length $n$ \textit{nondeterministically},
+and then polynomially verifying that one of the sequence is: a path (in $\O(n^2)$) and 
+costs less than $B$ (in $\O(n^3)$).  \\[.2cm]
+
+\textbf{SAT or Satisfiability Problem}:
+Given a boolean expression $B$, the problem consists in deciding if there $\exists$ a 
+boolean assignment $\V \vDash B$. We consider only boolean expressions given in conjunctive
+normal form ($(a \lor b) \land (c \lor d \lor e) \hdots$), which is guaranteed to exist for
+any boolean expression. \\[.2cm]
+
+\textbf{Theorem. (Cook) SAT is $\NP$ complete}. \textit{Proof.}
+Since CIRCUIT SAT $\red{\text{logspace}}$ SAT, proving that $\text{CIRCUIT SAT}$ is $\NP$-complete
+is enough. Then, $\forall I \in \NP, I \red{\text{logspace}}$ CIRCUIT SAT.
+Let $I \in \NP$, solved by $N$ in time $n^k$, we build $f \in \LOGSPACE$ such that $x \in I \iff f(x) $ is a satisfiable boolean formula.
+We assume that $N$ has degree of nondeterminism $d=2$ (if not, an equivalent machine can be built), so we can encode
+a succession of choices of length $\leq \abs{x}^k$, as a sequence of binary bits $B$. Only if $B$ is fixed,
+we can build the \textit{computation table} of $(N(x),B)$. As seen in the proof of $\P$-completeness 
+of CIRCUIT VALUE, one can build a boolean circuit $C$ for each cell, but it also depends on $b_{i-1}$ since
+$\Delta_N$ is not a function and $d=2$. Analogously, a circuit for the complete computation of 
+$C_N$, can be built with $(\abs{x}^k-1)(\abs{x}^k-1)$ copies of $C$, but each copy will have $3m+1$ inputs.
+\qed. \\[.2cm]
+
+\textbf{CLIQUE Problem}: Determine if a undirected graph $G = (V, E)$ has a clique 
+of degree $k$. 
+\textbf{Theorem: SAT $\red{\text{logspace}}$ CLIQUE}. \textit{Proof.} 
+Given a bool. expr. $B$ in CNF $\bigwedge_{1 \leq k \leq n} C_k$, build $f(B) = (V, E)$ such that 
+$V$ is the set of literal occurences in $B$ and $E = \{(i,j) \mid i \in C_k \impl (j \notin C_k \land i \neq \neg j)\}$.
+$(\V \vDash B) \iff f(B)$ has a clique of degree $k$. $f \in \LOGSPACE$ since 2 counters are needed.
+\qed \\[.2cm]
+
+\textbf{HAM or Hamiltonian Path}:
+The problem consists in deciding if a direct graph there exists a path, 
+called \textit{hamiltonian}, that goes through every vertex a single time.
+(A variant called \textit{hamiltonian cycle} requires the path to go back to the 
+starting node). \\[.2cm]
+
+\textbf{Theorem: HAM $\red{\text{logspace}}$ SAT}. \textit{Proof.} 
+Given the direct graph $G$, we construct $f \in \LOGSPACE$ such that 
+$f(G)$ is a boolean formula in conjunctive normal form
+ that is satisfiable $\iff G$ has an hamiltonian path.
+If $G$ has $n$ vertices, $f(G)$ has $n^2$ variables, written as
+$x_{i,j}$ with $1 \leq i,j \leq n$, which represents if the $i$-th element 
+of the path is the $j$-th vertex in the graph. $f(G)$ will be the conjuction of these clauses:
+\begin{tabular}{@{}ll@{}}
+$(\neg x_{i,j} \lor \neg x_{k,j})\  i \neq k$ & Same node appears once in the path\\
+$(\neg x_{i,j} \lor \neg x_{i,k})\  j \neq k$ & Two nodes cannot be the $i$-th \\
+$(x_{i,1} \lor \hdots \lor \neg x_{i,n})\  1 \leq i \leq n$ & Some node is the $i$-th \\
+$(x_{1,j} \lor \hdots \lor \neg x_{n,j})\  1 \leq j \leq n$ & Every node is in path \\
+$(\neg x_{k,i} \lor \neg x_{k+1, j})$ & $\forall k.\ 1 \leq k \leq n-1$ and $\forall(i,j) \notin A$\\
+& If $(i,j)$ is not an edge of $G$, it must not \\
+& appear in the path.
+\end{tabular}
+It is then immediate to see that $(\V \vDash f(G)) \iff G$ has an hamiltonian path,
+and that $\V$ represents a permutation of nodes of $G$. To verify that $f \in \LOGSPACE$,
+we build a $k$-tape IO TM computing $f$ that writes on the output tape the first 4 clauses.
+To do so, $\Sigma = \{tt,ff, \lor, \land, \neg, (,), 0, 1\}$ and it needs a work tape containing $n$, and 3 work tapes containing a binary representation
+of the 3 variables (counters) seen in the clauses: $i,j,k$. This requires $\O(\log n)$ bits on work
+tapes. \qed \\[.2cm]
+
+\textbf{CIRCUIT SAT Problem}:
+Let $C$ a \textit{boolean circuit}, or a direct acyclic graph $(V,E)$ where the $n$ vertices are
+called ports and edges are sorted pairs. Ports have 0,1 or 2 inputs, and are of sort
+$s(i) \in \{tt,ff,\neg,lor,\land\} \cup X$ where $X$ is the set of variables. Circuit
+input ports are only variables or truth values and have no inputs. The circuit output
+is by convention the last port $n$. A denotational semantic $\llbracket i \rrbracket_{\V}$
+given a boolean assignment is straightforward to define.
+The \textit{CIRCUIT SAT} problem consists in deciding if an assignment $\V$ exists such that
+$\V(C) = tt$. A nondeterministic TM solving the problem will first generate all possible assignments
+at the same time and then verifies \textit{polinomially} that an assigment satisfies $C$ by 
+letting the truth values \textit{flow} through the circuit. \\[.2cm]
+
+
+\textbf{Theorem. CIRCUIT SAT $\red{\text{logspace}}$ SAT}: \textit{Proof. }
+Given $C = (V, E)$, with variables in $X$, build $f \in \LOGSPACE$ such that 
+$\exists \V .\ \llbracket C \rrbracket_{\V} = tt \iff \exists V' .\ \forall x \in X .\ V'(x) = V(x) \land (V' \vDash f(C))$.
+For each port $g$ in $C$ build the conjuncts of $f(C)$ as follows: 
+\begin{tabular}{@{}ll@{}}
+    $g$ & $g$ is the output port in $C$ \\
+    $(\neg g \lor x) \land (g \lor \neg x)$ & if $s(g) = x \in X$, $g \iff x$ \\ 
+    $(\neg g \lor \neg h) \land (g \lor x)$ &  if $s(g) = \neg$, $(h,g) \in E$, then $g \iff \neg h$ \\ 
+    $(\neg h \lor  g) \land (\neg k \lor g) \land (h \lor k \lor \neg g)$ &  if $s(g) = \lor$ and $(h,g), (k,g) \in E$, \\
+    & then $g \iff (h \lor k)$ \\ 
+    $(\neg g \lor  h) \land (\neg g \lor k) \land (\neg h \lor \neg k \lor g)$ &  if $s(g) = \land$ and $(h,g), (k,g) \in E$, \\
+    & then $g \iff (h \land k)$ 
+\end{tabular}
+See the reduction from HAM to SAT to verify that this reduction is logarithmic in space. \\[.2cm]
+
+\textbf{Corollary. CIRCUIT VALUE $\red{\text{logspace}}$ SAT, CLIQUE}
+
+
+\subsection{P Complete Problems}
+
+\textbf{Theorem. CIRCUIT Value is $\red{\text{logspace}}$-complete for $\P$}:
+CIRCUIT Value problems are specific cases of CIRCUIT SAT problems where the input
+ports are only truth values $s(i) \in \{tt, ff\}$ and \textit{can not be variables.}
+
+\textit{Proof.} For an arbitrary $I \in \P$, build the computation table for the machine $M$ deciding it.
+Encode each $\rho \in \Sigma'$ as a string of binary bits of length $m = \log_2(\#\Sigma')$.
+With this representation the computation table will be rectangular, with width $m \times \abs{x}^k$. 
+Since the transition function $\delta_M$ is fixed, as in the computation table we can build 
+the boolean representation $S_{i,j}$ of $T_{i,j}$ that depends only on the values in the previous line $i-1$ and columns 
+corresponding to T's $j-1,j,j+1$.
+We can then build a boolean circuit $C$, with $3m$ inputs that computes the transition function and
+outputs $m$ bits corresponding to $S_{i,j}$. To build $f$, transform $T$ into a circuit $C_I$ that 
+is composed by copies of $C$ for each cell $i,j$. $(\abs{x}^k - 1)(\abs{x}^k - 2)$ copies are enough because 
+the first and last columns are fixed, and the first row contains the input on tape.
+By simple induction it is provable than $C_{i,j}$ has $S_{i,j}$ as output $\iff T(i,j) = \rho$, that is 
+encoded as $S_{i,j}$. Since we need a single copy of $C$ for each index in the table $i,j$, $f$ can be defined
+in logarithmic space because a TM computing it only needs these index counters on work tapes, stored in
+base 2. \qed \\[.2cm]
+
+\textbf{Theorem. CIRCUIT VALUE $\red{\text{logspace}}$ CIRCUIT SAT}: \textit{Proof.} Obvious generalization.
+
+\end{multicols}
+\end{document}

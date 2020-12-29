@@ -1,0 +1,630 @@
+\documentclass[10pt,landscape]{article}
+\usepackage{multicol}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[a3paper,landscape]{geometry}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+% COMANDI UTILI
+
+\newcommand{\bumper}{\triangleright}
+\newcommand{\impl}{\Rightarrow}
+\newcommand{\conv}{\downarrow}
+\newcommand{\dive}{\uparrow}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\E}{\mathcal{E}}
+\renewcommand{\H}{\mathcal{H}}
+
+\newcommand{\undef}{\text{undefined}}
+\newcommand{\red}[1]{\leqslant_{#1}}
+%\newcommand{\C}{\mathbb{C}}
+\renewcommand{\iff}{\Leftrightarrow}
+
+
+\theoremstyle{plain}% default
+\newtheorem*{thm}{Theorem}
+\newtheorem*{lem}{Lemma}
+\newtheorem*{prop}{Prop}
+\newtheorem*{cor}{Corollary}
+\theoremstyle{definition}
+\newtheorem{defn}{Definizione}[section]
+\newtheorem{conj}{Congettura}[section]
+\newtheorem{exmp}{Esempio}[section]
+\newtheorem{exrc}[exmp]{Esercizio}
+\theoremstyle{remark}
+\newtheorem*{comm}{Commento}
+\newtheorem*{note}{Note}
+\newtheorem{caso}{Caso}
+
+
+% 2008-04
+% Changed page margin code to use the geometry package. Also added code for
+% conditional page margins, depending on paper size. Thanks to Uwe Ziegenhagen
+% for the suggestions.
+
+% 2006-08
+% Made changes based on suggestions from Gene Cooperman. <gene at ccs.neu.edu>
+
+
+% To Do:
+% \listoffigures \listoftables
+% \setcounter{secnumdepth}{0}
+
+
+% This sets page margins to .5 inch if using letter paper, and to 1cm
+% if using A4 paper. (This probably isn't strictly necessary.)
+% If using another size paper, use default 1cm margins.
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+	{ \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+
+% Turn off header and footer
+\pagestyle{empty}
+ 
+
+% Redefine section commands to use less space
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+
+% Define BibTeX command
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+
+% -----------------------------------------------------------------------
+
+\begin{document}
+
+\raggedright
+\footnotesize
+\begin{multicols}{4}
+
+
+% multicol parameters
+% These lengths are set only within the two main columns
+%\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+     \Large{\textbf{Computability Theory Cheat Sheet}} \\
+     \small{Alessandro Cheli - 2020 - University of Pisa}
+\end{center}
+
+\section{Algorithm Definition}
+\begin{tabular}{@{}ll@{}}
+\verb!-! & Finite set of available instructions \\
+\verb!-! & Made of finite instructions \\ 
+\verb!-! & Discrete steps taking finite time \\ 
+\verb!-! & Each step depends only on the previous ones \\ 
+\verb!-! & No limit to steps or space during execution 
+\end{tabular}
+
+\section{Turing Machine}
+A Turing Machine $M$ is $(Q, \Sigma, \delta, q_0)$ \\
+\begin{tabular}{@{}ll@{}}
+$Q (\ni q_i), h \notin Q$ &  Set of states, $h$ halting state\\
+$\Sigma(\ni \sigma, \sigma ', \hdots)$ &  Set of symbols \\ 
+$q_0 \in Q$ & Initial state \\ 
+$\delta \subseteq (Q \times \Sigma) \times (Q \cup \{h\} \times \Sigma \times \{L,R,-\})$  & 
+is the transition function \\
+if $(q, \bumper, q', \sigma, D) \in \delta$ & then $\sigma = \bumper, D = R$
+\end{tabular}
+$\Sigma^*$ is the free monoid generated from $\Sigma$. $"\cdot"$ is the
+associative string concatenation operator. $\epsilon$ is the empty string 
+and identity element.
+
+\subsection{Configuration}
+A configuration $C$ of a TM $M$ is a quadruple:
+$(q,u,\sigma,v) \in (Q \cup \{h\}) \times \Sigma^* \times \Sigma \times \Sigma^F)$ where 
+$\Sigma^F = \Sigma^* \cdot (\Sigma \backslash \{\#\}) \cup \{\epsilon\}$.
+
+$\sigma$ is the currently selected symbol under the head of the machine.
+Short notation is $(q, u \underline{\sigma}v)$ or $(q, w)$ when position is not needed.
+
+\subsection{Computations}
+
+A computation is a finite succession of computation steps
+
+\begin{tabular}{@{}ll@{}}
+$(q, w) \to (q', w')$ & Computation step \\
+$(q_0, w) \to^* (q', w') $ & Reflexive and transitive closure of comp. steps. \\
+$(q_0, w) \to^n_M (q', w') $ & Machine $M$ computes $w'$ in $n$ steps. \\
+$\conv, \dive$ & Converges and diverges
+\end{tabular}
+
+\subsection{T(uring)-Computability}
+Let $\Sigma, \Sigma_0, \Sigma_1$ be alphabets, let $\#, \bumper \notin \Sigma_0 \cup \Sigma_1$
+and $\Sigma_0 \cup \Sigma_1 \subset \Sigma$.
+
+Let $f$ be a function $f: \Sigma^*_0 \to \Sigma^*_1$. 
+
+\begin{center}
+    $f$ is turing computable by a machine $M$ $\iff$ 
+    $\forall w \in \Sigma^*_0 \ : f(w) = z \iff (q_0, \underline{\bumper}w) \to^*_M (h, \bumper z\underline{\#})$   
+\end{center}
+
+\subsection{While Computability}
+A command $C$ computes $f : \Var \to \N \iff$
+
+
+\begin{center}
+    $\forall \sigma \in \Var \to \N \ : \ f(x) = n \iff \left\langle C, \sigma \right\rangle \to^* \sigma' \land \sigma'(x) = n$
+\end{center}
+
+% TODO for and while
+
+\section{Problems and Functions}
+
+%TODO coda di colomba
+
+\subsection{Goldbach Conjecture}
+$\forall m > 1 \ : \ 2m = p_1 + p_2$ with $p_1, p_2$ prime numbers.
+
+% =============================== PROBLEMS AND FUNCTIONS =======================
+
+\subsection{Total Function}
+$f : A \to B$, subset of $A \times B$ is total $\iff$
+\begin{tabular}{@{}ll@{}}
+$\forall a \in A \  \exists b \in B \  : (a,b) \in f $ & $f$ is defined everywhere \\
+$(a,b),(a,c) \in f \impl b = c$ & uniqueness
+\end{tabular}
+
+\subsection{Partial Function}
+$f : A \to B$, subset of $A \times B$ is a \textit{partial} function $\iff$
+\begin{tabular}{@{}ll@{}}
+$(a,b),(a,c) \in f \impl b = c$ & uniqueness \\
+$\exists$ at least a $b \in B \ : \ f(a) = b$ & not required to be defined everywhere
+\end{tabular}
+
+%\subsection{Notation}
+%\begin{tabular}{@{}ll@{}}
+%    $f(a) \conv$ & converges $\iff \exists b : f(a) = b$ \\
+%    $f(a) \dive$ & diverges $\iff \nexists b : f(a) = b$ \\
+%\end{tabular}
+
+\subsection{Primitive Recursive Functions}
+Are the minimum class of functions $\mathcal{C}$, from $\N^n$ with $n \geq 0$ to $\N$. 
+
+\begin{tabular}{@{}ll@{}}
+    1: Zero & $\lambda x_1, \hdots, x_k . 0$ with $k \geq 0$ \\
+    2: Successor & $\lambda x . x + 1$ \\
+    3: Identity (projections) & $\lambda x_1, \hdots, x_k . x_i$ with $1 \leq i leq k$ \\ 
+    4: Composition & $\lambda x_1, \hdots, x_m. h(g_1(\hdots, x_m), \hdots, g_k(\hdots, x_m))$\\
+    & $h$ func. in $k$ variables, $g_1, \hdots, g_k$ funcs. in \\
+    &  $m$ variables. The composition is p.r. \\ 
+\end{tabular}
+
+\subsubsection{Recursion Axiom}
+Let $h$ be a p.r. func. in $k+1$ variables, $g$ be a p.r. func in $k-1$ variables.
+The function $f$ in $k$ variables defined as follow is then p.r.
+
+\begin{center}
+    $f = \left\lbrace \begin{matrix}
+        f(0,x_2,\hdots,x_k) & = & g(x_2, \hdots, x_k) & \text{final step} \\ 
+        f(x_1 + 1, \hdots, x_k) & = & h(x_1, f(x_1, \hdots, x_k), x_2, \hdots, x_k) & \text{iteration} 
+    \end{matrix} \right.$
+\end{center}
+
+This represents a \textbf{FOR} loop. $x_1$, the first variable of $f$ is the decrementing counter.
+$g$ is the final step. $h$ represents loop steps.
+This is guaranteed to terminate. One can define basic maths primitives with p.r. functions.
+
+\subsection{$\mu$-Recursive (or General Recursive) Functions }
+The class of $\mu$-recursive functions extends the class of p.r. functions with an additional
+condition to also include partial functions. We use letters $\varphi$ and $\psi$ to denote most $\mu$.r. functions.
+
+\begin{tabular}{@{}ll@{}}
+    6: Minimization & if $\varphi(x_1, \hdots, x_n, y)$ is $\mu$.r. in $n+1$ variables then \\
+    & $\psi$ in $n$ variables is $\mu$.r. if it is defined by:
+\end{tabular}
+
+
+\begin{eqnarray*}
+    \psi(x_1, \hdots, x_n) = \mu y [\varphi(x_1, \hdots, x_n, y) = 0) \\
+    \forall z \leq y . \varphi(x_1, \hdots, x_n, z) \conv ]
+\end{eqnarray*}
+
+The $\mu$ operator corresponds to \texttt{while} loops. It starts with $y=0$ and
+increments it until the $\varphi$ equals to 0 (loop guard), and returns y.
+If an upper bound is placed on $y$ then $\psi$ may be p.r. 
+If $\varphi$ is p.r. the additional convergence condition is guaranteed. 
+Diagonalization cannot be applied directly to $\mu$.r. funcs. because $\varphi_n(n)$ may diverge.
+Not all $\mu$.r. functions can be extended to total functions.
+A function is $\mu$-computable if a $\mu$.r. definition can be given.
+
+\subsection{Gödel Numbering}
+The characteristic function of the set of prime numbers is p.r. The exponents 
+of the unique prime factorization of any natural numbers are given by p.r. functions. 
+It follows that every sequence of natural numbers can be encoded as a natural number,
+by using the numbers as the exponents of the prime factoring.
+\textbf{This encoding is injective but not surjective}: an effective encoding must be surjective. 
+Gödel gave a better, surjective encoding.
+It follows that such \textit{encoding and decoding functions} are p.r.
+All of Turing Machines, FOR/WHILE programs, p.r. and $\mu$-recursive functions can be effectively encoded
+and decoded as natural numbers by treating the syntactic symbols as distinct natural numbers.
+Computations (successions of configurations) can also be encoded and decoded
+
+\subsection{Ackermann Function}
+The Ackerman function $A$ is effectively computable but grows faster than any possible p.r. function.
+It calls itself a number of times that is not possible to achieve with a p.r. definition.
+
+
+\begin{equation*}
+    \begin{aligned}
+        A(0,0,y) = y & \quad & A(0,x+1, y) = A(0,x,y) + 1 \\ 
+        A(1,0,y) = 0 & \quad & A(z+2, 0,y) = 1 \\ 
+        A(z+1,x+1,y) &=&   A(z, A(z+1,x,y),y)
+    \end{aligned}
+\end{equation*}
+
+\subsection{Church-Turing Thesis}
+
+\begin{center}
+    \framebox{
+        \parbox[t][]{7cm}{
+        The (intuitively/effectively) computable functions are all and only
+        the (partial), T-Computable functions
+        }
+    }
+\end{center}
+
+T-computable, $\mu$-computable and WHILE-computable functions are the same class
+of functions. It is the same for all the other turing complete formalisms: what
+is computable does not change.
+
+% =========================== Classical results PROOFS =============================
+
+\section{Classical Results}
+
+
+\begin{note}
+    Given an effective numbering, $\varphi_i$ denotes the partial function computed
+    by TM $M_i$. For $i \neq j$, functions may be semantically equal: $\varphi_i = \varphi_j$,
+    but surely $M_i \neq M_j$.
+\end{note}
+
+\begin{thm}
+    The class of Primitive Recursive functions (and extensions) does not contain all the effectively computable functions:
+    \begin{proof}
+        reductio ad absurdum
+        \begin{tabular}{@{}ll@{}}
+            1: Encode and enumerate p.r. functions & $f_0, \hdots, f_n $. There are $\N$ \\ 
+            2: Define diagonal func. $g(x) = f_x(x)+1$ & Intuitively computable \\
+            3: $\forall n . g(n) \neq f_n(n) \impl \forall n . g \neq f_n $ & $g$ doesn't appear in list \\ 
+          
+        \end{tabular}
+        Implies there is no formalism for expressing only and all total functions. 
+    \end{proof}
+\end{thm}
+
+
+\begin{thm}
+    Computable functions are $\#(\N)$. Total computable functions are $\#(\N)$. There exists 
+    functions that are not computable.
+
+    \begin{proof}
+        Computable functions can be given a Gödel numbering. Therefore there exists a 1-1 mapping with
+        natural numbers. All the possible total functions $\{f: \N \to \N \}$ are $2^{\#(\N)}$.
+    \end{proof}
+\end{thm}
+
+
+\begin{thm}
+    \textbf{Padding Lemma}: every computable function $\varphi_i$ has $\#(\N)$ indexes.
+    $\forall i . \exists A_i $ infinite set of indexes such that $\forall y \in A_i. \varphi_y = \varphi_i$
+
+    \begin{proof}
+        If a program $P_j$ in WHILE computes $\varphi_i$, one can build 
+        $\#(\N)$ other programs that compute the same thing, semantically equal to
+        $\varphi_i$ by just adding a \texttt{skip} command at the end of the program.
+        The new program's index will change because an effective numbering depends only 
+        on the syntactic description of the program.  
+    \end{proof}
+\end{thm}
+
+\columnbreak
+
+\begin{thm}
+    \textbf{Kleene I: Normal form theorem}: There exist a predicate $T(i,x,y)$
+    and a function $U(y)$ that are total and computable, such that 
+    $\forall i,x . \varphi(x) = U(\mu y.T(i,x,y))$
+
+    \begin{proof}
+        Define $T$ as true $\iff y$ is encodes a successful computation of the TM $M_i$ on
+        input $x$. Check if each step encoded in $y$ is a step of $M_i(x)$ and if it 
+        terminates. This procedure is total and p.r.. Define $U$ such that it retrieves
+        the word on tape in the last configuration of $y$ (the result) and return its encoding.
+        This is a p.r. procedure
+    \end{proof}
+\end{thm}
+
+
+\begin{cor}
+    A function $f$ is T-computable $\iff$ it is $\mu$-computable
+\end{cor}
+
+
+\begin{thm}
+    \textbf{Enumeration}: $\exists z . \forall i,x .\ \varphi_z(i,x) = \varphi_i(x)$ 
+    \begin{proof}
+        Guarantees that a formalism that expresses all computable function has
+        an universal algorithm. Therefore there exists an \textit{Universal Turing Machine}.
+        $\varphi_z(i,x) = U(\mu y. T(i, x, y)) = \varphi_i(x)$
+    \end{proof}
+\end{thm}
+
+% TODO mdt universale
+
+\begin{thm}
+    \textbf{s-1-1}: There exists a total, injective computable function $s^1_1$ of 2 
+    variables such that $\forall x, y . \ \varphi_{s^1_1(i,x)}(y) = \lambda y . \varphi_i(x,y) $.
+
+    \begin{proof}
+        To compute $\varphi_{s^1_1(i,x)}(y)$, retrieve $M_i$, set the initial state $M_i(x,y)$ (algorithmic procedure 
+        guaranteed to terminate). By the \textit{Church-Turing Thesis} there exists $s = s^1_1$.
+        If $s$ was not injective, build $s'$ such that $\varphi_{s(i,x)} = \varphi_{s'(i,x)}$ such 
+        that $s'$ is strictly increasing, which means injective. This can be done because from the padding lemma
+        we have that there are $\#(\N)$ indexes of TMs that compute $s(i,x)$.
+    \end{proof}
+\end{thm}
+
+The Parameter Theorem entails partial evaluation as we know it.
+
+
+\begin{thm}
+    \textbf{s-m-n Parameter Theorem}: $\forall m,n \geq 0 . \ \exists s^m_n$ injective total computable function
+    in $m+1$ variables $. \ \forall i, x_1, \hdots, x_m . $
+    \[\varphi^{(n)}_{s^m_n(i, x_1, \hdots, x_m)} = \lambda y_1, \hdots, y_n . \ \varphi^{(m+n)}_i (x_1, \hdots, x_m, y_1, \hdots, y_n)\]
+\end{thm}
+
+
+\begin{thm}
+    \textbf{Expressiveness}: A formalism is \textbf{Turing-equivalent}, or universal (computes all and only T-computable functions) $\iff$
+    it has an universal algorithm (enumeration theorem is valid) and the parameter theorem is valid.
+\end{thm}
+
+
+\begin{thm}
+    \textbf{Kleene II: Recursion}: $\forall f$ total computable. $\exists n$ such that $\varphi_n = \varphi_{f(n)}$
+
+
+    \begin{proof}
+        Let there be a computable function $\psi_i(u, x)$ defined as 
+        \[\psi_i(u,x) = \varphi_{d(u)}(x) = \begin{cases}
+            \varphi_{\varphi_u(u)}(x) & \text{ if } \phi_u(u)\conv \\ 
+            \undef & \text{otherwise}
+        \end{cases} \]
+        Note that $d(u) = \lambda u . s(i,u) $. Since $d(u)$ is 
+        total and computable (by the \textit{parameter theorem}), and $f$
+        is total and computable by hypothesis, $f(d(u))$ is total and computable 
+        as well. Therefore, it has an index, let it be $v$: $\varphi_v(x) = f(d(x))$.
+        It follows that $\varphi_v(v) \conv$.
+        Let now $n = d(v)$. We have that
+        \[\varphi_n = \varphi_{d(v)} = \varphi_{\varphi_v(v)} = \varphi_{f(d(v))} = \varphi_{f(n)} \]
+
+        $n$ is called \textit{fixed point}.
+    \end{proof}
+\end{thm}
+
+
+\begin{thm}
+    Considering the hypothesis of the \textit{Recursion Theorem}, there are $\#(\N)$ fixed points of $f$, and 
+    the fixed point is computable from a total injective function from the index of $f$.
+
+    \begin{proof}
+        (Injectivity of $g$ is not considered).
+        Let $h(x)$ be a total computable function such that $\forall n . \ \varphi_{h(x)}(n) = \varphi_x(d(n)) $.
+        Then $g(x) = d(h(x))$ 
+    \end{proof}
+\end{thm}
+
+
+% =========================== Reductions =============================
+
+\section{Reductions}
+
+A (decision) problem (a set) $A$ reduces to $B$ with \textit{reduction} $f$, in symbols $A \red{f} B$ when $a \in A \iff f(a) \in B$.
+We also have that $A \red{f} B \iff \overline{A} \red{f} \overline{B}$ because
+$x \in \overline{A} \iff x \notin A \iff f(x) \notin B \iff f(x) \in \overline{B}$.
+
+\subsection{Reduction Relations}
+
+A relation of reductions ($\red{F}$) can be defined on a class of functions $F$ as follows,
+note that $\red{F}$ is also a partial pre-order.
+
+\[A \red{F} B \iff \exists f \in F . \ A \red{f} B \]
+
+\subsection{Properties}
+Let $\D$ and $\E$ two classes of problems such that $\D \subseteq \E$,
+and $\D \subseteq \H$. A reduction relation $\red{F}$ classifies $\D$ and 
+$\E \iff \forall A,B,C$ (problems):
+
+\begin{tabular}{@{}ll@{}}
+    1: Reflexivity & $A \red{F} A$ \\
+    2: Transitivity & $A \red{F} B, B \red{F} C \impl A \red{F} C$ \\
+    3: $\D$ closed by reduction & $A \red{F} B, B \in \D \impl A \in \D$\\
+    4: $\E$ closed by reduction & $A \red{F} B, B \in \E \impl A \in \E$ \\ 
+\end{tabular}
+
+Equivalently:
+
+\begin{tabular}{@{}ll@{}}
+    1: Identity & $\text{id} \in F$ \\
+    2: Closed by composition & $f,g \in F \impl f \circ g \in F$ \\
+    3: & $f \in F, B \in \D \impl \{x \mid f(x) \in B \} \in \D $ \\
+    4: & $f \in F, B \in \E \impl \{x \mid f(x) \in B \} \in \E $\\ 
+\end{tabular}
+
+\subsection{Hard and Complete Problems}
+If $\red{F}$ classifies $\D$ and $\E$, then $\forall$  problems $A,B,H$.
+\begin{tabular}{@{}ll@{}}
+    \verb!-! & $A \red{F} B \wedge B \red{F} A \impl A \equiv B$ \\
+    \verb!-! & $H$ is $\red{F}$-hard for $\E$ if $\forall A \in \E. \ A \red{F} H$ \\
+    \verb!-! & $H$ is $\red{F}$-complete for $\E$ if $\forall A \in \E. \ A \red{F} H \wedge H \in \E$
+\end{tabular}
+
+
+\begin{thm}
+    If $\red{F}$ classifies $\D$ and $\E$, $\D \subseteq \E$ and $C$ is complete for $\E$ then 
+    $C \in \D \iff \D = \E$
+    
+    \begin{proof}
+        $(\Leftarrow)$ is obvious. $(\impl)$: Let $C \in D$ and $A \in \E$. 
+        By completeness, $A \red{F} C$ and $A \in \D$, then $\E \subseteq \D$ which implies
+        $\E = \D$ 
+    \end{proof} 
+\end{thm}
+
+
+\begin{thm}
+    \textbf{Completeness is "transitive" for reductions}:
+    If $A$ is complete for $\E$, $A \red{F} B$ and $B \in \E$ then $B$ is complete for $\E$.
+\end{thm}
+
+% =========================== Undecidable Problems =============================
+
+\section{Undecidable Problems}
+
+A set $I$ is \textbf{recursive} if its characteristic function $\chi_I$ is total computable.
+$\chi_I(x) = 1 \iff x \in I$ and $0$ otherwise.
+A set $I$ is \textbf{recursively} (or computably) \textbf{enumerable} $\iff \exists i . \ I = \{x \mid \varphi_i(x)\conv \}$.
+That function is said semi-characteristic and the problem is said semi-decidable.
+We define the classes R for recursive sets and RE for recursively enumerable sets.
+ 
+\begin{center}
+    \begin{tabular}{@{}ll@{}ll@{}}
+    $I \in R \impl I \in RE \quad$  & $A \in R \iff \overline{A} \in R$ \quad \quad \quad & $I, \overline{I} \in RE \iff I,\overline{I} \in R$
+    \end{tabular}
+\end{center}
+
+\begin{thm}
+    $I$ is RE $\iff I = \emptyset $ or $I$ is the range of a total computable function.     
+    %TODO proof
+\end{thm}
+
+\begin{center}
+    \framebox{
+        \parbox[t][]{5.1cm}{
+        $K = \{ x \mid \varphi_x(x) \conv \}$. $K$ is RE but not R
+        }
+    }
+\end{center}
+
+
+\begin{proof}
+    by \textit{reductio ad absurdum}:
+    Suppose by absurd that $\chi_K$ was total and computable, for $K$ to be recursive.
+    Then $f = \left( \begin{cases}
+        \varphi_x(x) + 1 & \text{ if } x \in K ; \  0 \  \text{otherwise}
+    \end{cases} \right)$ would be total and computable. We obtain a contradiction because $\forall x . \ f(x) \neq \varphi_x(x)$.            
+\end{proof}
+
+We define $\text{rec}$ as the class of total computable functions.
+Note that $\overline{K} \nleqslant_{\text{rec}} K$ and $K \nleqslant_{\text{rec}} \overline{K}$
+\begin{center}
+    \framebox{
+        \parbox[t][]{4.8cm}{
+            Halting Problem: \\
+        $K_0 = \{ (x,y) \mid \varphi_y(x) \conv \}$. $K_0$ is not R
+        }
+    }
+\end{center}
+
+
+\begin{proof}
+    $x \in K \iff (x,x) \in K_0$. If $K_0$ was R, $K$ would too.
+\end{proof}
+
+
+\begin{thm}
+    \textbf{$K$ is $\red{rec}$-complete for RE}
+    \begin{proof}
+        Let $A \in RE$.
+        $x \in A \iff f(x) \in K$ with $f(x) = \lambda x. s(i, x)$
+        \begin{eqnarray*}
+            A &=& \{ x \mid \varphi_j(x) \conv \} = \{ x \mid \varphi_i(x, y) \conv \} \\
+            &=& \{ x \mid \varphi_{s(i,x)}(y) \conv \} = \{ x \mid \varphi_{s(i,x)}(s(i,x)) \conv \} \\
+            &=& \{ x \mid s(i,x) \in K \}
+        \end{eqnarray*}
+    \end{proof}
+\end{thm}
+
+$A$ is a set of indexes representing functions $\iff \forall x,y . \ x \in A \wedge \varphi_x = \varphi_y \impl y \in A$.
+
+
+\begin{thm}
+    If $A$ is a set of indexes representing functions, with $\emptyset \neq A \neq \N$, then $K \red{rec} A$, or $K \red{rec} \overline{A}$.
+
+    \begin{proof}
+        Let $i_0$ be the index of the \textit{always undefined} function $\varphi_{i_0}(x)$, such that 
+        $i_0 \in \overline{A}$ (if not proceed symmetrically). \textbf{Let us prove that $K \red{\text{rec}} A$}:
+        Pick $i_1 \in A$. We have that $\varphi_{i_0} \neq \varphi_{i_1}$ by prev. definition.
+        \[\psi(x,y) = \varphi_{f(x)}(y) = \begin{cases}
+            \varphi_{i_1}(y) & \text{ if } x \in K \\ 
+            \undef = \varphi_{i_0}(y) & \text{otherwise}
+        \end{cases}\]
+        With $f(x) = \lambda x . s(i, x)$, we now have that $x \in K \impl \varphi_{f(i)} = \varphi_{i_1} \impl f(x) \in A$ and we also have that
+        $x \notin K \impl \varphi_{f(x)} = \varphi_{i_0} \impl f(x) \in \overline{A} \impl f(x) \notin A$
+    \end{proof}
+\end{thm}
+
+
+\begin{cor}
+    If $K \red{\text{rec}} A \wedge K \red{\text{rec}} \overline{A}$ then $A$ \textbf{is not RE}.
+\end{cor}
+
+\begin{thm}
+    \textbf{Rice}: Let $\mathcal{A}$ is a class of computable functions.
+    The set $A = \{n \mid \varphi_n \in \mathcal{A}\}$ is recursive $\iff$ 
+    $\mathcal{A} = \emptyset$ or $\mathcal{A}$ is the class of all computable functions.
+
+    \begin{proof}
+        If $\emptyset \neq \mathcal{A} \neq \N$ then apply the previous theorem. If $A$ was recursive then also $K$ would be recursive.
+        \textit{Reductio ad absurdum}. In the other two cases proof is obvious.
+    \end{proof}
+\end{thm}
+
+Other undecidable (not RE) problems: semantic equality of two functions,
+$FIN = \{x \mid \text{dom}(\varphi_x) \text{ is finite}\},\ INF = \overline{FIN} = \{x \mid 
+\text{dom}(\varphi_x) \text{ is infinite}\},\ TOT = \{x \mid \varphi_x \text{ total}\}, \ 
+REC = \{x \mid \text{dom}(\varphi_x) \text{ is recursive}\},\  
+CONST = \{x \mid \varphi_x \text{ is total and constant}\}, \ 
+EXT = \{x \mid \varphi_x \text{ can be extended to total computable}\}$,  
+
+
+% ===========================================================================
+
+\end{multicols}
+\end{document}
